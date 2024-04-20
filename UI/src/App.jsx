@@ -1,26 +1,25 @@
 import { useState } from "react";
+import useUserrnameHook from "./hooks/usernameHook";
 import "./App.css";
+import SendMessages from "./components/SendMessages";
+import Messages from "./components/Messages";
 
 function App() {
-	const [messages, setMessages] = useState([
-		{
-			text: "Hello World.",
-			sender: "Saad",
-			timestamp: new Date().getTime(),
-		},
-	]);
+	const sender = useUserrnameHook();
+	const [messages, setMessages] = useState([]);
+
 	return (
 		<div className="App">
 			<div className="grid grid-cols-1">
-				<div className="mt-10"></div>
+				<div className="mt-10 overflow-y-auto max-h-[70vh]">
+					<Messages messages={messages} />
+				</div>
 				<div className="mt-10 grid grid-cols-2 absolute bottom-0 left-0 right-0 p-3">
-					<textarea
-						className="border-2 border-black"
-						id="new-message"
-					></textarea>
-					<button id="send-message" className="justify-self-end max-w-11">
-						Send
-					</button>
+					<SendMessages
+						messages={messages}
+						sender={sender}
+						setMessages={setMessages}
+					/>
 				</div>
 			</div>
 		</div>
