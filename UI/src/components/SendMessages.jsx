@@ -1,4 +1,4 @@
-const SendMessages = ({ sender, messages, setMessages }) => {
+const SendMessages = ({ socket, sender, messages, setMessages }) => {
 	const sendMessage = () => {
 		const message = document.getElementById("new-message").value;
 		if (message && message.length > 0) {
@@ -10,6 +10,7 @@ const SendMessages = ({ sender, messages, setMessages }) => {
 				timestamp: new Date().getTime(),
 			};
 
+			socket.emit("message", newMessage);
 			setMessages([...messages, newMessage]);
 		}
 	};
