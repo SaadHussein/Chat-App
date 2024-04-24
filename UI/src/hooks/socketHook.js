@@ -6,7 +6,7 @@ export default function useSocketHook({ chatId }) {
 
     useEffect(() => {
         setSocket(io("/", { query: { chatId } }));
-    }, []);
+    }, [chatId]);
 
     return socket;
 }
