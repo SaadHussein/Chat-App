@@ -9,17 +9,25 @@ app.get('/', (req, res) => {
     res.send("Hello From Backend");
 });
 
-const sockets = [];
+const chats = {};
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    const chatId = socket.request._query.chatId;
 
-    sockets.push(socket);
+    if (!chats[chatId]) {
+        chats[chatId] = [];
+    }
+
+    chats[chatId].push(socket);
 
     socket.on('message', (message) => {
         console.log(message);
+        const currentChatId = message.chatId;
 
-        sockets.forEach((s) => {
+        if (!chats[currentChatId]) return;
+
+        chats[chatId].forEach((s) => {
             if (s === socket) return;
             s.emit("message", message);
         });

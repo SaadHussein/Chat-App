@@ -1,4 +1,4 @@
-const SendMessages = ({ socket, sender, messages, setMessages }) => {
+const SendMessages = ({ socket, sender, messages, setMessages, chatId }) => {
 	const sendMessage = () => {
 		const message = document.getElementById("new-message").value;
 		if (message && message.length > 0) {
@@ -7,6 +7,7 @@ const SendMessages = ({ socket, sender, messages, setMessages }) => {
 				id: messages.length + 1,
 				text: message,
 				sender,
+				chatId,
 				timestamp: new Date().getTime(),
 			};
 
