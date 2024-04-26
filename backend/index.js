@@ -6,7 +6,8 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 const dbConnect = require("./db");
-const { login, verifyOTP, validateToken } = require('./services/user');
+const { login, verifyOTP, validateToken, inviteUser } = require('./services/user');
+const Chat = require("./models/chat");
 
 dbConnect();
 
@@ -42,20 +43,57 @@ io.on('connection', (socket) => {
 
     chats[chatId].push(socket);
 
-    socket.on('message', ({ message, token }) => {
-        console.log(message);
-        const currentChatId = message.chatId;
-
-        if (!validateToken(token)) {
+    socket.on("inviteUsers", async ({ chatId, token, invitedUser }) => {
+        const decodedToken = validateToken(token);
+        if (!decodedToken) {
             console.log("Invalid Token");
             return;
         }
 
+        inviteUser({ chatId, invitedUser });
+    });
+
+    socket.on('message', async ({ message, token }) => {
+        console.log(message);
+        const currentChatId = message.chatId;
+
+        const decodedToken = validateToken(token);
+        if (!decodedToken) {
+            console.log("Invalid Token");
+            return;
+        }
+
+        await Chat.findOrCreate({
+            where: {
+                name: currentChatId
+            },
+            defaults: {
+                ownerId: decodedToken.userId
+            }
+        });
         if (!chats[currentChatId]) return;
 
         chats[chatId].forEach((s) => {
             if (s === socket) return;
             s.emit("message", message);
+        });
+    });
+
+    socket.on("makePrivate", async ({ chatId, token }) => {
+        const decodedToken = validateToken(token);
+        if (!decodedToken) {
+            console.log("Invalid Token");
+            return;
+        }
+
+        await Chat.update({
+            privacy: 1
+        }, {
+
+            where: {
+                name: chatId,
+                ownerId: decodedToken.userId
+            }
         });
     });
 });

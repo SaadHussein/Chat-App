@@ -4,11 +4,11 @@ import "./App.css";
 import SendMessages from "./components/SendMessages";
 import Messages from "./components/Messages";
 import useSocketHook from "./hooks/socketHook";
-import NewChat from "./components/NewChat";
 import useChatIdHook from "./hooks/chatIdHook";
 import useAuthHook from "./hooks/authHook";
 import UserLogin from "./components/UserLogin";
 import Sidebar from "./components/sidebar";
+import ChatOptions from "./components/ChatPrivacy";
 
 function App() {
 	const [messages, setMessages] = useState([]);
@@ -33,7 +33,9 @@ function App() {
 					<Sidebar />
 					<div className="flex-1">
 						<header className="bg-white p-4 text-gray-700">
-							<h1 className="text-2xl font-semibold">{chatId}</h1>
+							<h1 className="text-2xl font-semibold">
+								{chatId} <ChatOptions chatId={chatId} socket={socket} />
+							</h1>
 						</header>
 
 						{/*  */}

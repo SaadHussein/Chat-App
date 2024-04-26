@@ -1,11 +1,11 @@
 require('dotenv').config();
 const User = require("../models/user");
-const { sendEmail } = require("./email");
+const { sendOTP, sendInvite } = require("./email");
 const jwt = require("jsonwebtoken");
 
 async function login(data) {
     const otp = Math.floor(100000 + Math.random() * 900000);
-    sendEmail(data.email, otp);
+    sendOTP(data.email, otp);
     let user = await User.findOne({
         where: {
             email: data.email
@@ -41,4 +41,8 @@ function validateToken(token) {
     }
 }
 
-module.exports = { login, verifyOTP, validateToken };
+function inviteUser({ chatId, invitedUser }) {
+    sendInvite(invitedUser, chatId);
+}
+
+module.exports = { login, verifyOTP, validateToken, inviteUser };
