@@ -32,4 +32,13 @@ async function verifyOTP(data) {
     }
 }
 
-module.exports = { login, verifyOTP };
+function validateToken(token) {
+    try {
+        const decode = jwt.verify(token, process.env.JWT_SECRET);
+        return decode;
+    } catch (e) {
+        return false;
+    }
+}
+
+module.exports = { login, verifyOTP, validateToken };

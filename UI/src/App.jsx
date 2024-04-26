@@ -8,13 +8,14 @@ import NewChat from "./components/NewChat";
 import useChatIdHook from "./hooks/chatIdHook";
 import useAuthHook from "./hooks/authHook";
 import UserLogin from "./components/UserLogin";
+import Sidebar from "./components/sidebar";
 
 function App() {
 	const [messages, setMessages] = useState([]);
 	const sender = useUserrnameHook();
 	const chatId = useChatIdHook();
-	const { isLoggedIn } = useAuthHook();
 	const socket = useSocketHook({ chatId });
+	const { isLoggedIn } = useAuthHook({ socket });
 
 	console.log(isLoggedIn);
 	useEffect(() => {
@@ -26,16 +27,17 @@ function App() {
 	}, [socket, messages, setMessages]);
 
 	return (
-		<div className="App">
+		<>
 			{isLoggedIn && (
-				<div className="grid grid-cols-1">
-					<div className="">
-						<NewChat />
-					</div>
-					<div className="mt-10 overflow-y-auto max-h-[70vh]">
+				<div className="flex h-screen overflow-hidden">
+					<Sidebar />
+					<div className="flex-1">
+						<header className="bg-white p-4 text-gray-700">
+							<h1 className="text-2xl font-semibold">{chatId}</h1>
+						</header>
+
+						{/*  */}
 						<Messages messages={messages} />
-					</div>
-					<div className="mt-10 grid grid-cols-2 absolute bottom-0 left-0 right-0 p-3">
 						<SendMessages
 							socket={socket}
 							chatId={chatId}
@@ -47,7 +49,7 @@ function App() {
 				</div>
 			)}
 			{!isLoggedIn && <UserLogin socket={socket} />}
-		</div>
+		</>
 	);
 }
 

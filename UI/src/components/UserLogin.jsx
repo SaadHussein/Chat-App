@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 const UserLogin = ({ socket }) => {
 	const [email, setEmail] = useState("");
 
-	const login = () => {
+	const login = (e) => {
+		e.preventDefault();
 		const userEmail = document.getElementById("email").value;
 		setEmail(userEmail);
 		socket.emit("login", { email: userEmail });
@@ -12,26 +13,61 @@ const UserLogin = ({ socket }) => {
 	useEffect(() => {
 		if (!socket) return;
 		socket.on("otpSent", () => {
+			const userEmail = document.getElementById("email").value;
 			const otp = prompt("Please Enter The OTP That Sent To Your Email.");
-			socket.emit("otpVerification", { otp, email });
+			socket.emit("otpVerification", { otp, email: userEmail });
 		});
 
 		socket.on("otpFailed", () => {
 			alert("OTP Failed");
 		});
-
-		socket.on("otpSuccess", (data) => {
-			alert("OTP Success");
-			localStorage.setItem("token", data.token);
-		});
-	}, [socket, email]);
+	}, [socket]);
 
 	return (
 		<>
-			<p>Please Enter Your Email</p>
-			<label htmlFor="email">Email</label>
-			<input type="email" id="email" />
-			<button onClick={login}>Login</button>
+			<div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+				<div className="sm:mx-auto sm:w-full sm:max-w-sm">
+					<img
+						className="mx-auto h-10 w-auto"
+						src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+						alt="Your Company"
+					/>
+					<h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+						Sign in or Create an account.
+					</h2>
+				</div>
+
+				<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+					<div>
+						<label
+							htmlFor="email"
+							className="block text-sm font-medium leading-6 text-gray-900"
+						>
+							Email address
+						</label>
+						<div className="mt-2 mb-4">
+							<input
+								id="email"
+								name="email"
+								type="email"
+								autoComplete="email"
+								required
+								className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							/>
+						</div>
+					</div>
+
+					<div>
+						<button
+							type="button"
+							onClick={login}
+							className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						>
+							Sign in
+						</button>
+					</div>
+				</div>
+			</div>
 		</>
 	);
 };

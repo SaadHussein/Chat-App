@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 const dbConnect = require("./db");
-const { login, verifyOTP } = require('./services/user');
+const { login, verifyOTP, validateToken } = require('./services/user');
 
 dbConnect();
 
@@ -36,17 +36,20 @@ io.on('connection', (socket) => {
         }
     });
 
-    if (!isLoggedIn) return;
-
     if (!chats[chatId]) {
         chats[chatId] = [];
     }
 
     chats[chatId].push(socket);
 
-    socket.on('message', (message) => {
+    socket.on('message', ({ message, token }) => {
         console.log(message);
         const currentChatId = message.chatId;
+
+        if (!validateToken(token)) {
+            console.log("Invalid Token");
+            return;
+        }
 
         if (!chats[currentChatId]) return;
 

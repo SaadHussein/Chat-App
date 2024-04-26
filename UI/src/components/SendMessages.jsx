@@ -11,21 +11,31 @@ const SendMessages = ({ socket, sender, messages, setMessages, chatId }) => {
 				timestamp: new Date().getTime(),
 			};
 
-			socket.emit("message", newMessage);
+			const token = localStorage.getItem("token");
+			socket.emit("message", { message: newMessage, token });
 			setMessages([...messages, newMessage]);
 		}
 	};
 
 	return (
 		<>
-			<textarea className="border-2 border-black" id="new-message"></textarea>
-			<button
-				id="send-message"
-				className="justify-self-end max-w-11"
-				onClick={sendMessage}
-			>
-				Send
-			</button>
+			<footer className="bg-white border-t border-gray-300 p-4 absolute bottom-0 w-3/4">
+				<div className="flex items-center">
+					<textarea
+						type="text"
+						id="new-message"
+						placeholder="Type a message..."
+						className="w-full p-2 rounded-md border border-gray-400 focus:outline-none focus:border-blue-500"
+					></textarea>
+					<button
+						onClick={sendMessage}
+						id="send-message"
+						className="bg-indigo-500 text-white px-4 py-2 rounded-md ml-2"
+					>
+						Send
+					</button>
+				</div>
+			</footer>
 		</>
 	);
 };
