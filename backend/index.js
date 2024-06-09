@@ -12,8 +12,12 @@ const { Login, VerifyOTP } = require('./sockets/auth');
 const { updateChatPrivacy } = require('./sockets/chat');
 const { InviteUser } = require('./sockets/user');
 const Message = require('./models/message');
+const path = require("path");
 
 dbConnect();
+
+const buildPath = path.normalize(path.join(__dirname, "../ui/dist"));
+app.use(express.static(buildPath));
 
 app.get('/', (req, res) => {
     res.send("Hello From Backend");
