@@ -32,7 +32,7 @@ function App() {
 		<>
 			{isLoggedIn && (
 				<div className="flex h-screen overflow-hidden">
-					<Sidebar />
+					<Sidebar socket={socket} />
 					<div className="flex-1">
 						<header className="bg-white p-4 text-gray-700">
 							<h1 className="text-2xl font-semibold">

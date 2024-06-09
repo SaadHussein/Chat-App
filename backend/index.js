@@ -55,6 +55,23 @@ io.on('connection', (socket) => {
         socket.emit("getMessages", messages);
     });
 
+    socket.on("getChats", async (data) => {
+        const token = data.token;
+        const decodedToken = validateToken(token);
+
+        if (!decodedToken) {
+            return;
+        }
+
+        const chats = await Chat.findAll({
+            where: {
+                ownerId: decodedToken.userId
+            }
+        });
+
+        socket.emit("getChats", chats);
+    });
+
     socket.on('message', async ({ message, token }) => {
         console.log(message);
         const currentChatId = message.chatId;
