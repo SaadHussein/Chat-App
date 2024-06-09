@@ -9,12 +9,14 @@ import useAuthHook from "./hooks/authHook";
 import UserLogin from "./components/UserLogin";
 import Sidebar from "./components/sidebar";
 import ChatOptions from "./components/ChatPrivacy";
+import useMessagesHook from "./hooks/messagesHook";
 
 function App() {
 	const [messages, setMessages] = useState([]);
 	const sender = useUserrnameHook();
 	const chatId = useChatIdHook();
 	const socket = useSocketHook({ chatId });
+	useMessagesHook({ chatId, socket, setMessages });
 	const { isLoggedIn } = useAuthHook({ socket });
 
 	console.log(isLoggedIn);

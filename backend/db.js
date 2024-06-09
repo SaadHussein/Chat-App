@@ -1,5 +1,6 @@
 require("./models/user");
 require("./models/chat");
+require("./models/message");
 const sequelize = require("./sequelize");
 
 

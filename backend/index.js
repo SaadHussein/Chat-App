@@ -8,6 +8,10 @@ const io = new Server(server);
 const dbConnect = require("./db");
 const { login, verifyOTP, validateToken, inviteUser } = require('./services/user');
 const Chat = require("./models/chat");
+const { Login, VerifyOTP } = require('./sockets/auth');
+const { updateChatPrivacy } = require('./sockets/chat');
+const { InviteUser } = require('./sockets/user');
+const Message = require('./models/message');
 
 dbConnect();
 
@@ -22,20 +26,9 @@ io.on('connection', (socket) => {
     const chatId = socket.request._query.chatId;
     const isLoggedIn = socket.request._query.isLoggedIn;
 
-    socket.on('login', async (data) => {
-        await login(data);
-        socket.emit("otpSent");
-    });
+    socket.on('login', Login(socket));
 
-    socket.on('otpVerification', async (data) => {
-        const result = await verifyOTP(data);
-
-        if (!result) {
-            socket.emit("otpFailed");
-        } else {
-            socket.emit("otpSuccess", { token: result });
-        }
-    });
+    socket.on('otpVerification', VerifyOTP(socket));
 
     if (!chats[chatId]) {
         chats[chatId] = [];
@@ -43,14 +36,23 @@ io.on('connection', (socket) => {
 
     chats[chatId].push(socket);
 
-    socket.on("inviteUsers", async ({ chatId, token, invitedUser }) => {
+    socket.on("inviteUsers", InviteUser);
+
+    socket.on("getMessages", async (data) => {
+        const token = data.token;
         const decodedToken = validateToken(token);
+
         if (!decodedToken) {
-            console.log("Invalid Token");
             return;
         }
 
-        inviteUser({ chatId, invitedUser });
+        const messages = await Message.findAll({
+            where: {
+                chatId: data.chatId
+            }
+        });
+
+        socket.emit("getMessages", messages);
     });
 
     socket.on('message', async ({ message, token }) => {
@@ -71,6 +73,13 @@ io.on('connection', (socket) => {
                 ownerId: decodedToken.userId
             }
         });
+
+        await Message.create({
+            chatId: currentChatId,
+            text: message.text,
+            sender: decodedToken.userId
+        });
+
         if (!chats[currentChatId]) return;
 
         chats[chatId].forEach((s) => {
@@ -79,23 +88,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on("makePrivate", async ({ chatId, token }) => {
-        const decodedToken = validateToken(token);
-        if (!decodedToken) {
-            console.log("Invalid Token");
-            return;
-        }
-
-        await Chat.update({
-            privacy: 1
-        }, {
-
-            where: {
-                name: chatId,
-                ownerId: decodedToken.userId
-            }
-        });
-    });
+    socket.on("makePrivate", updateChatPrivacy);
 });
 
 server.listen(3000, () => {

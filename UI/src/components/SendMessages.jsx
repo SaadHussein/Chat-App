@@ -4,11 +4,11 @@ const SendMessages = ({ socket, sender, messages, setMessages, chatId }) => {
 		if (message && message.length > 0) {
 			document.getElementById("new-message").value = "";
 			const newMessage = {
-				id: messages.length + 1,
+				//id: messages.length + 1,
 				text: message,
 				sender,
 				chatId,
-				timestamp: new Date().getTime(),
+				//timestamp: new Date().getTime(),
 			};
 
 			const token = localStorage.getItem("token");
