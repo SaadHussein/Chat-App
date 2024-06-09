@@ -10,6 +10,8 @@ import UserLogin from "./components/UserLogin";
 import Sidebar from "./components/sidebar";
 import ChatOptions from "./components/ChatPrivacy";
 import useMessagesHook from "./hooks/messagesHook";
+import OurModal from "./components/common/OurModal";
+import useAppStore from "./stores/appStore";
 
 function App() {
 	const [messages, setMessages] = useState([]);
@@ -17,6 +19,7 @@ function App() {
 	const chatId = useChatIdHook();
 	const socket = useSocketHook({ chatId });
 	useMessagesHook({ chatId, socket, setMessages });
+	const { modal, setModal } = useAppStore();
 	const { isLoggedIn } = useAuthHook({ socket });
 
 	console.log(isLoggedIn);
@@ -53,6 +56,10 @@ function App() {
 				</div>
 			)}
 			{!isLoggedIn && <UserLogin socket={socket} />}
+
+			<OurModal onClick={modal.onClick} show={modal.show}>
+				{modal.children}
+			</OurModal>
 		</>
 	);
 }
